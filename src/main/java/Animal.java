@@ -4,7 +4,8 @@ public class Animal {
 
     private String[] eats;
 
-    //private String[][] narr;
+    private String[][] nestedArray = null;
+    private  Plant[] objectArray;
     public Plant pllant = null;
 
     private int noOfLegs;
@@ -16,6 +17,10 @@ public class Animal {
         this.eats = food;
         this.noOfLegs = legs;
         this.pllant = new Plant("lemon", 30);
+        String[][] na = {{"one", "two"}, {"three", "four"}};
+        this.nestedArray = na;
+        Plant[] parr = {new Plant("rosii", 5), new Plant("castraveti", 7)};
+        this.objectArray = parr;
     }
 
     public boolean isVegetarian() {
