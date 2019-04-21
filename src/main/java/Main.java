@@ -28,7 +28,7 @@ public class Main {
 //        Animal animal = new Gson().fromJson(json, Animal.class);
 
 
-        String myJson = displayObjectFields(myCat);
+        String myJson = saveObjectFieldsJson(myCat);
         System.out.println(myJson);
         Cat newCat = createObjectFromJson(myJson, Cat.class);
 
@@ -56,9 +56,9 @@ public class Main {
                 if (field.get(theObject) == null)
                     continue;
                 else if (fieldType.isArray())
-                    field.set(theObject, null);//json.get(field.getName()));//result += displayArray(fieldType.getComponentType(), field.get(theObject));
+                    field.set(theObject, null);//json.get(field.getName()));//result += saveArrayJson(fieldType.getComponentType(), field.get(theObject));
                 else if (!isJavaLang(field.get(theObject)))
-                    field.set(theObject, createObjectFromJson(json.getString(field.getName()), fieldType));//result += displayObjectFields(field.get(theObject));
+                    field.set(theObject, createObjectFromJson(json.getString(field.getName()), fieldType));//result += saveObjectFieldsJson(field.get(theObject));
                 else if (fieldType.isAssignableFrom(String.class))
                     field.set(theObject, json.getString(field.getName()));
                 else
@@ -70,7 +70,7 @@ public class Main {
         return theObject;
     }
 
-    public static String displayObjectFields(Object theObject) throws IllegalAccessException {
+    public static String saveObjectFieldsJson(Object theObject) throws IllegalAccessException {
         if (isJavaLang(theObject)) {
             if (theObject.getClass().equals(String.class))
                 return ("\"" + theObject + "\"");
@@ -96,9 +96,9 @@ public class Main {
                     continue;
                     //System.out.println("null");
                 else if (fieldType.isArray())
-                    result += displayArray(fieldType.getComponentType(), field.get(theObject));
+                    result += saveArrayJson(fieldType.getComponentType(), field.get(theObject));
                 else if (!isJavaLang(field.get(theObject)))
-                    result += displayObjectFields(field.get(theObject));
+                    result += saveObjectFieldsJson(field.get(theObject));
                 else if (fieldType.isAssignableFrom(String.class))
                     result += ("\"" + field.get(theObject) + "\"");
                 else
@@ -112,7 +112,7 @@ public class Main {
         return result;
     }
 
-    public static String displayArray(Class arrayType, Object theArray) throws IllegalAccessException {
+    public static String saveArrayJson(Class arrayType, Object theArray) throws IllegalAccessException {
         String result = "";
         int length = java.lang.reflect.Array.getLength(theArray);
 
@@ -122,7 +122,7 @@ public class Main {
             result += ("[");
             for (int j = 0; j < length; j++) {
                 Object arr2 = java.lang.reflect.Array.get(theArray, j);
-                result += displayArray(arrayType.getComponentType(), arr2);
+                result += saveArrayJson(arrayType.getComponentType(), arr2);
                 if (j != length - 1)
                     result += (",");
             }
@@ -132,7 +132,7 @@ public class Main {
             result += ("[");
             for (int j = 0; j < length; j++) {
                 //System.out.print(java.lang.reflect.Array.get(theArray, j).toString());
-                result += displayObjectFields(java.lang.reflect.Array.get(theArray, j));
+                result += saveObjectFieldsJson(java.lang.reflect.Array.get(theArray, j));
                 if (j != length - 1)
                     result += (",");
             }
