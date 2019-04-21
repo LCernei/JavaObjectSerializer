@@ -1,14 +1,18 @@
 import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Array;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import java.util.Iterator;
 
 public class Main {
 
-    public static void main(String[] args) throws IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException, JSONException {
+    public static void main(String[] args) throws IllegalAccessException, NoSuchMethodException, InstantiationException, InvocationTargetException, JSONException, ClassNotFoundException {
         System.out.println("Hwasd");
 
         Integer myInt = new Integer(42);
@@ -27,7 +31,6 @@ public class Main {
 //        String json = new Gson().toJson(animal);
 //        Animal animal = new Gson().fromJson(json, Animal.class);
 
-
         String myJson = saveObjectFieldsJson(myCat);
         System.out.println(myJson);
         Cat newCat = createObjectFromJson(myJson, Cat.class);
@@ -36,7 +39,7 @@ public class Main {
         System.out.println("UUUUUUUU\n" + json2);
     }
 
-    public static <T> T createObjectFromJson(String jsonString, Class<T> aClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, JSONException {
+    public static <T> T createObjectFromJson(String jsonString, Class<T> aClass) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException, JSONException, ClassNotFoundException {
         T theObject = aClass.getConstructor().newInstance();
 
         JSONObject json = new JSONObject(jsonString);
@@ -52,22 +55,33 @@ public class Main {
                 if (Modifier.toString(field.getModifiers()).contains("final"))
                     continue;
 
-
-                if (field.get(theObject) == null)
-                    continue;
                 else if (fieldType.isArray())
-                    field.set(theObject, null);//json.get(field.getName()));//result += saveArrayJson(fieldType.getComponentType(), field.get(theObject));
+                    field.set(theObject, createArrayFromJson(json.getJSONArray(field.getName()), fieldType));//json.get(field.getName()));//result += saveArrayJson(fieldType.getComponentType(), field.get(theObject));
                 else if (!isJavaLang(field.get(theObject)))
                     field.set(theObject, createObjectFromJson(json.getString(field.getName()), fieldType));//result += saveObjectFieldsJson(field.get(theObject));
                 else if (fieldType.isAssignableFrom(String.class))
                     field.set(theObject, json.getString(field.getName()));
                 else
                     field.set(theObject, json.get(field.getName()));
-
             }
             theClass = theClass.getSuperclass();
         }
         return theObject;
+    }
+
+    public static Object[] createArrayFromJson(JSONArray jsonArray, Class arrayType) throws JSONException, ClassNotFoundException {
+        Object arrayObject = Array.newInstance(arrayType.getComponentType(), jsonArray.length());
+
+        for (int i = 0; i < jsonArray.length(); i++) {
+            //JSONObject jobj = jsonArray.getJSONObject(i);
+
+
+
+            Array.set(arrayObject, i, jsonArray.get(i));
+        }
+
+        Object[] o = (Object[])arrayObject;
+        return o;
     }
 
     public static String saveObjectFieldsJson(Object theObject) throws IllegalAccessException {
